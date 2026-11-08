@@ -75,16 +75,16 @@ document.addEventListener("DOMContentLoaded", () => {
   // Phrases written the way clients actually search for these services
   const phrases = [
     "Google Ads expert for Shopify",
-    "Meta Ads specialist for e-commerce",
+    "Facebook Ads specialist",
     "Klaviyo email marketing expert",
-    "Klaviyo abandoned cart and welcome flows",
+    "Klaviyo abandoned cart flows",
     "B2B cold email outreach",
-    "Cold email lead generation with Instantly.ai",
-    "Performance Max campaign management",
-    "Google Merchant Center suspension fix",
+    "Instantly.ai cold email setup",
+    "Performance Max management",
+    "Merchant Center suspension fix",
     "TikTok Ads manager",
-    "GA4 conversion tracking setup",
-    "Increase ROAS and lower CPA"
+    "GA4 conversion tracking",
+    "Increase ROAS, lower CPA"
   ];
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (typed && !reduceMotion) {
@@ -110,6 +110,16 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("[data-upwork]").forEach(a => {
     if (!a.getAttribute("href").startsWith("http")) a.remove();
   });
+
+  // Logo slider: clone the logos once so the right-to-left loop is seamless
+  const track = document.querySelector(".marquee-track");
+  if (track && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    [...track.children].forEach(li => {
+      const copy = li.cloneNode(true);
+      copy.setAttribute("aria-hidden", "true");
+      track.appendChild(copy);
+    });
+  }
 
   // Footer year
   document.getElementById("year").textContent = new Date().getFullYear();
