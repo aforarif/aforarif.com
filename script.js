@@ -72,15 +72,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Typing search box: types each phrase, pauses, deletes, moves to the next
   const typed = document.getElementById("typed");
+  // Phrases written the way clients actually search for these services
   const phrases = [
-    "Google Ads management",
-    "Meta Ads for e-commerce",
-    "TikTok Ads campaigns",
-    "Google Shopping and Performance Max",
-    "Merchant Center suspension fix",
-    "Klaviyo email flows",
-    "Conversion tracking setup",
-    "Lower cost per purchase"
+    "Google Ads expert for Shopify",
+    "Meta Ads specialist for e-commerce",
+    "Klaviyo email marketing expert",
+    "Klaviyo abandoned cart and welcome flows",
+    "B2B cold email outreach",
+    "Cold email lead generation with Instantly.ai",
+    "Performance Max campaign management",
+    "Google Merchant Center suspension fix",
+    "TikTok Ads manager",
+    "GA4 conversion tracking setup",
+    "Increase ROAS and lower CPA"
   ];
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (typed && !reduceMotion) {
@@ -101,6 +105,11 @@ document.addEventListener("DOMContentLoaded", () => {
     };
     setTimeout(tick, 2200); // first phrase is already visible, so start by deleting it
   }
+
+  // Hide Upwork links until a real profile URL is set in index.html
+  document.querySelectorAll("[data-upwork]").forEach(a => {
+    if (!a.getAttribute("href").startsWith("http")) a.remove();
+  });
 
   // Footer year
   document.getElementById("year").textContent = new Date().getFullYear();
@@ -126,6 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const body =
       `Name: ${data.get("name")}\n` +
       `Email: ${data.get("email")}\n` +
+      `Service: ${data.get("service")}\n` +
       `Website: ${data.get("website") || "Not provided"}\n\n` +
       `${data.get("message")}`;
     window.location.href =
