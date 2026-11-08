@@ -119,6 +119,14 @@ document.addEventListener("DOMContentLoaded", () => {
       copy.setAttribute("aria-hidden", "true");
       track.appendChild(copy);
     });
+    // Same comfortable reading speed on every screen: ~55px/s on desktop, ~38px/s on phones
+    const setSpeed = () => {
+      const pxPerSecond = window.innerWidth < 600 ? 38 : 55;
+      track.style.setProperty("--marquee-duration", (track.scrollWidth / 2 / pxPerSecond).toFixed(1) + "s");
+    };
+    setSpeed();
+    window.addEventListener("load", setSpeed);
+    window.addEventListener("resize", setSpeed);
   }
 
   // Back to top button: show after scrolling down a screen

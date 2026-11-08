@@ -338,13 +338,18 @@ p + p { margin-top: 1rem; }
 }
 
 /* ===== Brand logo slider ===== */
-.marquee { position: relative; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
-.marquee-track { list-style: none; display: flex; gap: 56px; width: max-content; animation: marquee 32s linear infinite; padding: 6px 0; }
-.marquee:hover .marquee-track { animation-play-state: paused; }
-@keyframes marquee { to { transform: translateX(calc(-50% - 28px)); } }
-.logo-item { display: inline-flex; align-items: center; flex: none; height: 56px; font-weight: 700; font-size: 1.12rem; color: #3F3A4A; letter-spacing: -.01em; white-space: nowrap; opacity: .9; transition: opacity .25s, transform .25s; }
-.logo-item:hover { opacity: 1; transform: scale(1.05); }
-.logo-item.wordmark { font-weight: 600; color: #5B5566; }
+.marquee { position: relative; overflow: hidden; }
+/* Edge fades as overlays (cheaper than mask-image, keeps scrolling smooth on iPhone) */
+.marquee::before, .marquee::after { content: ""; position: absolute; top: 0; bottom: 0; width: 8%; z-index: 2; pointer-events: none; }
+.marquee::before { left: 0; background: linear-gradient(90deg, var(--white), rgba(255,255,255,0)); }
+.marquee::after { right: 0; background: linear-gradient(270deg, var(--white), rgba(255,255,255,0)); }
+.marquee-track { list-style: none; display: flex; width: max-content; padding: 6px 0; align-items: center; will-change: transform; animation: marquee var(--marquee-duration, 40s) linear infinite; }
+/* Pause on hover only where a real mouse exists (taps on phones won't freeze it) */
+@media (hover: hover) { .marquee:hover .marquee-track { animation-play-state: paused; } }
+@keyframes marquee { from { transform: translate3d(0,0,0); } to { transform: translate3d(-50%,0,0); } }
+.logo-item { display: inline-flex; align-items: center; flex: none; height: 56px; margin-right: 64px; font-weight: 700; font-size: 1.12rem; color: #2E2A36; letter-spacing: -.01em; white-space: nowrap; transition: transform .25s; }
+@media (hover: hover) { .logo-item:hover { transform: scale(1.06); } }
+.logo-item.wordmark { font-weight: 600; }
 
 /* ===== About highlights + Education ===== */
 .highlights { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
@@ -389,8 +394,7 @@ p + p { margin-top: 1rem; }
   .edu-grid { grid-template-columns: 1fr; }
   .edu-grid .info-card { flex-direction: column; gap: 12px; padding: 20px; }
   .logo-item { font-size: 1rem; }
-  .marquee-track { gap: 40px; animation-duration: 26s; }
-  @keyframes marquee { to { transform: translateX(calc(-50% - 20px)); } }
+  .logo-item { margin-right: 44px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .marquee-track { animation: none; flex-wrap: wrap; justify-content: center; width: auto; }
