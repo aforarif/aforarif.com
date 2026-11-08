@@ -121,6 +121,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Back to top button: show after scrolling down a screen
+  const toTop = document.getElementById("toTop");
+  const onScrollTop = () => toTop.classList.toggle("show", window.scrollY > window.innerHeight * 0.8);
+  onScrollTop();
+  window.addEventListener("scroll", onScrollTop, { passive: true });
+  toTop.addEventListener("click", e => {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    history.replaceState(null, "", location.pathname);
+  });
+
   // Footer year
   document.getElementById("year").textContent = new Date().getFullYear();
 

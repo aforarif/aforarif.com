@@ -396,3 +396,16 @@ p + p { margin-top: 1rem; }
 @media (prefers-reduced-motion: reduce) {
   .marquee-track { animation: none; flex-wrap: wrap; justify-content: center; width: auto; }
 }
+
+/* ===== Back to top button ===== */
+.to-top {
+  position: fixed; right: max(18px, env(safe-area-inset-right)); bottom: max(18px, env(safe-area-inset-bottom));
+  z-index: 60; width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--brand); color: #fff; box-shadow: 0 10px 24px rgba(111,45,189,.35);
+  opacity: 0; visibility: hidden; transform: translateY(16px);
+  transition: opacity .25s, transform .25s, visibility .25s, background .2s;
+}
+.to-top.show { opacity: 1; visibility: visible; transform: none; }
+.to-top:hover { background: var(--brand-dark); }
+.to-top svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+@media (max-width: 600px) { .to-top { width: 46px; height: 46px; } }
