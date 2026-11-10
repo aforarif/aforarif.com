@@ -2,7 +2,7 @@
 
 // Free audit pop-up: paste your Google Apps Script web app URL here to send submissions to Google Sheets.
 // Leave it empty and submissions open the visitor's email app instead (nothing is lost).
-const AUDIT_ENDPOINT = "";
+const AUDIT_ENDPOINT = "https://script.google.com/macros/s/AKfycbxUJF-ufvuhBO98OCGGkaSv6_FcSDTyKN4JY9b-vRQAQBzzGW5gp8dRfMWFKNkrdXAA/exec";
 
 document.addEventListener("DOMContentLoaded", () => {
   const header = document.getElementById("header");
