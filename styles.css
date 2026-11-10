@@ -485,3 +485,8 @@ p + p { margin-top: 1rem; }
   .legal-body { padding-top: 32px; padding-bottom: 64px; }
   .legal-page .nav .btn { padding: 8px 14px; font-size: .84rem; }
 }
+
+/* ===== Text highlights ===== */
+.hl { color: var(--brand); font-weight: 600; background: linear-gradient(transparent 64%, rgba(111,45,189,.13) 0); padding: 0 1px; border-radius: 2px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.lead strong { color: var(--ink); font-weight: 600; }
+.about-proof { color: var(--ink); font-weight: 500; padding-left: 16px; border-left: 3px solid var(--brand); }
