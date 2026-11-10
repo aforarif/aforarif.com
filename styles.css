@@ -400,7 +400,8 @@ p + p { margin-top: 1rem; }
   .search-box { height: 52px; padding: 0 18px; gap: 10px; margin-bottom: 1.25rem; }
   .search-icon { width: 18px; height: 18px; }
   .search-text { font-size: .9rem; }
-  .hero-cta { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .hero-cta { display: grid; grid-template-columns: 1.45fr 1fr; gap: 10px; }
+  .hero-cta .btn { white-space: nowrap; gap: 6px; }
   .hero-cta .btn { padding: 12px 10px; font-size: .86rem; border-radius: 10px; }
   .about-cta .btn { padding: 12px 20px; font-size: .9rem; }
   .highlights { grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -491,3 +492,6 @@ p + p { margin-top: 1rem; }
 .hl { color: var(--brand); font-weight: 600; background: linear-gradient(transparent 64%, rgba(111,45,189,.13) 0); padding: 0 1px; border-radius: 2px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
 .about-proof { color: var(--ink); font-weight: 500; padding-left: 16px; border-left: 3px solid var(--brand); }
 
+
+/* Hero WhatsApp button */
+.btn-wa svg { width: 18px; height: 18px; color: #25D366; transition: color .2s; }
