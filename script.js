@@ -106,6 +106,14 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(tick, 2200); // first phrase is already visible, so start by deleting it
   }
 
+  // Pricing buttons pre-select the matching service in the contact form
+  document.querySelectorAll("[data-service]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const select = document.querySelector('#contactForm select[name="service"]');
+      if (select) select.value = btn.dataset.service;
+    });
+  });
+
   // Hide Upwork links until a real profile URL is set in index.html
   document.querySelectorAll("[data-upwork]").forEach(a => {
     if (!a.getAttribute("href").startsWith("http")) a.remove();
