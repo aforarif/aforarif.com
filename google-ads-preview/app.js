@@ -16,7 +16,6 @@
   const descriptionsBox = $("#descriptions");
   const preview = $("#preview");
   const adsGrid = $("#adsGrid");
-  const errorsBox = $("#formErrors");
   const images = { logo: null, square: null, landscape: null };
   let activeFormat = "all";
 
@@ -74,6 +73,8 @@
       if (v && !seen.has(key)) seen.set(key, i + 1);
       warn.textContent = notes.join(" ");
     });
+    const lh = $("#lh1"), lhWarn = $('[data-warn="lh1"]');
+    if (lh && lhWarn) lhWarn.textContent = lh.value.includes("!") ? "Google doesn't allow exclamation marks in headlines." : "";
     $$('input[data-kind="d"]').forEach(input => {
       const warn = $(`[data-warn="${input.id}"]`);
       const v = input.value;
@@ -179,32 +180,21 @@
     drop.addEventListener("drop", e => handleFile(slotEl, e.dataTransfer.files[0]));
   });
 
-  // ---------- Validation ----------
+  // ---------- Collect inputs (anything can be missing) ----------
+  const FALLBACK = {
+    heads: ["Your Headline Here", "Your Second Headline", "Your Third Headline"],
+    descs: ["Your description appears here. Add one to see how it reads."]
+  };
   function collect() {
     const heads = $$('input[data-kind="h"]').map(i => i.value.trim()).filter(Boolean);
     const descs = $$('input[data-kind="d"]').map(i => i.value.trim()).filter(Boolean);
-    const biz = $("#bizName").value.trim();
-    const url = $("#finalUrl").value.trim();
-    return { heads, descs, biz, url };
-  }
-
-  function validate(data) {
-    const errors = [];
-    if (data.heads.length < 3) errors.push(`Add at least 3 headlines (you have ${data.heads.length}).`);
-    if (data.descs.length < 2) errors.push(`Add at least 2 descriptions (you have ${data.descs.length}).`);
-    if (data.descs.length && !data.descs.some(d => len(d) <= LIMITS.shortDescription)) errors.push("At least one description must be 60 characters or fewer.");
-    if (data.url && !/^https?:\/\/[^\s.]+\.[^\s]+$/i.test(data.url)) { errors.push("Enter a valid Final URL starting with https://"); $("#finalUrl").classList.add("invalid"); }
-    if (new Set(data.heads.map(h => h.toLowerCase())).size !== data.heads.length) errors.push("Each headline should be unique.");
-    return errors;
-  }
-
-  function showErrors(errors) {
-    if (!errors.length) { errorsBox.hidden = true; errorsBox.innerHTML = ""; return; }
-    errorsBox.hidden = false;
-    errorsBox.innerHTML = "<strong>Fix these to preview your ads:</strong>";
-    const ul = document.createElement("ul");
-    errors.forEach(e => { const li = document.createElement("li"); li.textContent = e; ul.appendChild(li); });
-    errorsBox.appendChild(ul);
+    return {
+      heads: heads.length ? heads : FALLBACK.heads,
+      descs: descs.length ? descs : FALLBACK.descs,
+      long: $("#lh1").value.trim(),
+      biz: $("#bizName").value.trim(),
+      url: $("#finalUrl").value.trim()
+    };
   }
 
   // ---------- Small DOM helper (text is always set safely) ----------
@@ -228,8 +218,10 @@
   const shuffle = arr => { const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
   const pick = arr => arr[Math.floor(Math.random() * arr.length)];
   const shortDesc = descs => pick(descs.filter(d => len(d) <= LIMITS.shortDescription)) || descs[0];
+  const longOr = d => (d.long && Math.random() > 0.35 ? d.long : pick(d.heads));
   function domainOf(url) {
-    try { return new URL(url).hostname.replace(/^www\./, ""); } catch (e) { return "yourwebsite.com"; }
+    if (!url) return "yourwebsite.com";
+    try { return new URL(/^https?:\/\//i.test(url) ? url : "https://" + url).hostname.replace(/^www\./, ""); } catch (e) { return "yourwebsite.com"; }
   }
 
   // ---------- Ad formats ----------
@@ -255,7 +247,7 @@
     const box = el("div", "ad ad-display");
     box.appendChild(media("landscape", "media"));
     const body = el("div", "body");
-    body.appendChild(el("h3", "", pick(d.heads)));
+    body.appendChild(el("h3", "", longOr(d)));
     body.appendChild(el("p", "", pick(d.descs)));
     const foot = el("div", "foot");
     foot.appendChild(logo("", d.biz));
@@ -283,7 +275,7 @@
     const body = el("div", "body");
     body.appendChild(logo("", d.biz));
     const t = el("div");
-    t.appendChild(el("h3", "", pick(d.heads) + " | " + shortDesc(d.descs)));
+    t.appendChild(el("h3", "", d.long && Math.random() > 0.4 ? d.long : pick(d.heads) + " | " + shortDesc(d.descs)));
     const meta = el("div", "yt-meta");
     meta.append(el("span", "spons", "Sponsored"), document.createTextNode(" · " + (d.biz || "Your Business")));
     t.appendChild(meta);
@@ -310,6 +302,7 @@
       const open = el("div", "open");
       open.appendChild(media(images.landscape || !images.square ? "landscape" : "square", "media"));
       const body = el("div", "body");
+      if (d.long) body.appendChild(el("h3", "gm-long", d.long));
       body.appendChild(el("p", "", pick(d.descs)));
       body.appendChild(el("span", "cta", "Visit site"));
       open.appendChild(body);
@@ -329,8 +322,7 @@
     src.appendChild(logo("", d.biz));
     src.append(el("span", "", d.biz || "Your Business"), el("span", "", "·"), el("span", "spons", "Sponsored"));
     body.appendChild(src);
-    const pair = shuffle(d.heads).slice(0, 2);
-    body.appendChild(el("h3", "", pair.join(" | ")));
+    body.appendChild(el("h3", "", d.long && Math.random() > 0.4 ? d.long : shuffle(d.heads).slice(0, 2).join(" | ")));
     body.appendChild(el("span", "cta", "Learn more"));
     box.appendChild(body);
     return box;
@@ -368,10 +360,6 @@
   // ---------- Buttons ----------
   form.addEventListener("submit", e => {
     e.preventDefault();
-    const data = collect();
-    const errors = validate(data);
-    showErrors(errors);
-    if (errors.length) { errorsBox.scrollIntoView({ behavior: "smooth", block: "center" }); return; }
     render();
     preview.hidden = false;
     preview.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -389,7 +377,6 @@
     textInputs.forEach(i => { i.value = ""; i.classList.remove("invalid"); updateCount(i); });
     $$(".upload").forEach(clearSlot);
     checkCopy();
-    showErrors([]);
     try { localStorage.removeItem(STORE_KEY); } catch (e) { /* ignore */ }
     preview.hidden = true;
     adsGrid.innerHTML = "";

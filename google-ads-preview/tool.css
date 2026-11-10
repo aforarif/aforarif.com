@@ -59,8 +59,6 @@
 .up-msg.warn { color: #B45309; }
 .up-msg.err { color: #DC2626; }
 
-.form-errors { border: 1px solid #FECACA; background: #FEF2F2; color: #991B1B; border-radius: 12px; padding: 14px 18px; font-size: .9rem; }
-.form-errors ul { margin: 6px 0 0 18px; }
 .actions { display: flex; flex-wrap: wrap; gap: 12px; }
 .actions .btn svg, .preview-head .btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 
@@ -153,3 +151,7 @@
   .actions .btn { flex: 1; }
   .ads-grid { columns: 1; }
 }
+
+.field-long { margin-top: 18px; padding-top: 18px; border-top: 1px dashed var(--line); }
+.tag-rec { font-style: normal; font-size: .66rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; background: var(--brand-soft); color: var(--brand); padding: 1px 7px; border-radius: 999px; margin-left: 6px; vertical-align: 2px; }
+.ad-gmail .open h3.gm-long { white-space: normal; font-size: 15px; margin: 0 0 6px; }

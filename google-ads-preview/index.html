@@ -50,7 +50,7 @@
       <div class="container">
         <p class="eyebrow">Free tool</p>
         <h1>Google Ads Preview Tool</h1>
-        <p class="tool-lead">Write your ad copy, upload your creatives and see how Google can mix your assets into different ads. Everything stays in your browser: nothing is uploaded.</p>
+        <p class="tool-lead">Add whatever you have, from a single headline to a full set of assets, and see how your ads can look across Google. Everything stays in your browser: nothing is uploaded.</p>
         <div class="cat-tabs" role="tablist" aria-label="Campaign type">
           <button class="cat-tab active" role="tab" aria-selected="true">Performance Max</button>
           <button class="cat-tab" role="tab" aria-selected="false" disabled>Search <em>Soon</em></button>
@@ -81,13 +81,18 @@
 
           <!-- Headlines -->
           <fieldset class="panel">
-            <legend><span class="step">2</span>Headlines <small>5 headlines, up to 30 characters each</small></legend>
+            <legend><span class="step">2</span>Headlines <small>Up to 30 characters each, plus one long headline up to 90</small></legend>
             <div id="headlines" class="field-list"></div>
+            <label class="field field-long">
+              <span class="field-top"><span>Long headline <em class="tag-rec">Recommended</em></span><span class="count" data-for="lh1"></span></span>
+              <input type="text" id="lh1" maxlength="90" data-max="90" data-kind="lh" autocomplete="off" placeholder="e.g. Hand-Poured Cornish Soy Candles, Delivered Free Across the UK">
+              <span class="warn" data-warn="lh1"></span>
+            </label>
           </fieldset>
 
           <!-- Descriptions -->
           <fieldset class="panel">
-            <legend><span class="step">3</span>Descriptions <small>4 descriptions, up to 90 characters each</small></legend>
+            <legend><span class="step">3</span>Descriptions <small>Up to 90 characters each</small></legend>
             <div id="descriptions" class="field-list"></div>
             <p class="hint"><svg><use href="#t-info"/></svg>Google requires at least one description of 60 characters or fewer for Performance Max.</p>
           </fieldset>
@@ -131,8 +136,6 @@
               </div>
             </div>
           </fieldset>
-
-          <div class="form-errors" id="formErrors" role="alert" hidden></div>
 
           <div class="actions">
             <button type="submit" class="btn" id="previewBtn"><svg><use href="#t-eye"/></svg>Preview ads</button>
