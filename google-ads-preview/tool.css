@@ -155,3 +155,22 @@
 .field-long { margin-top: 18px; padding-top: 18px; border-top: 1px dashed var(--line); }
 .tag-rec { font-style: normal; font-size: .66rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; background: var(--brand-soft); color: var(--brand); padding: 1px 7px; border-radius: 999px; margin-left: 6px; vertical-align: 2px; }
 .ad-gmail .open h3.gm-long { white-space: normal; font-size: 15px; margin: 0 0 6px; }
+
+/* Over-limit and checklist */
+.count.over { color: #DC2626; }
+.field input.over { border-color: #F87171; background: #FEF2F2; }
+.field .warn { color: #B45309; }
+.checklist { border-radius: 16px; padding: 18px 20px; margin: 0 0 26px; border: 1px solid; }
+.checklist.has-req { background: #FEF2F2; border-color: #FECACA; }
+.checklist.has-rec { background: #FFFBEB; border-color: #FDE68A; }
+.checklist.has-demo { background: var(--brand-tint); border-color: var(--line); }
+.checklist.ok { background: #F0FDF4; border-color: #BBF7D0; }
+.cl-head { font-weight: 600; color: var(--ink); }
+.checklist.ok .cl-head { color: #15803D; }
+.checklist ul { list-style: none; display: grid; gap: 8px; margin-top: 12px; }
+.checklist li { display: flex; align-items: flex-start; gap: 10px; font-size: .88rem; color: var(--ink); line-height: 1.5; }
+.cl-tag { flex: none; font-size: .66rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; padding: 2px 8px; border-radius: 999px; margin-top: 2px; min-width: 112px; text-align: center; }
+.cl-req .cl-tag { background: #FEE2E2; color: #B91C1C; }
+.cl-rec .cl-tag { background: #FEF3C7; color: #92400E; }
+.cl-demo .cl-tag { background: var(--brand-soft); color: var(--brand); }
+@media (max-width: 600px) { .checklist li { flex-direction: column; gap: 4px; } .cl-tag { min-width: 0; } }

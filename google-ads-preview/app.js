@@ -18,6 +18,7 @@
   const adsGrid = $("#adsGrid");
   const images = { logo: null, square: null, landscape: null };
   let activeFormat = "all";
+  let resetting = false;
 
   // ---------- Build headline and description fields ----------
   function buildFields(box, kind, count, max) {
@@ -27,7 +28,7 @@
       label.className = "field";
       label.innerHTML = `
         <span class="field-top"><span>${kind === "h" ? "Headline" : "Description"} ${i}</span><span class="count" data-for="${id}"></span></span>
-        <input type="text" id="${id}" maxlength="${max}" data-max="${max}" data-kind="${kind}" autocomplete="off">
+        <input type="text" id="${id}" data-max="${max}" data-kind="${kind}" autocomplete="off">
         <span class="warn" data-warn="${id}"></span>`;
       box.appendChild(label);
     }
@@ -38,15 +39,24 @@
   const textInputs = $$('input[type="text"], input[type="url"]', form);
 
   // ---------- Placeholders that show good practice ----------
-  const placeholders = {
-    h1: "e.g. Handmade Cornish Candles", h2: "e.g. Free UK Delivery Over £40", h3: "e.g. Shop Our Bestsellers",
-    h4: "e.g. Rated 4.9 by 2,000+ Buyers", h5: "e.g. New Autumn Collection",
-    d1: "e.g. Hand-poured soy candles made in Cornwall. Order today for free gift wrapping.",
-    d2: "e.g. Natural scents, clean burn, made to last.",
-    d3: "e.g. Bundle and save on gift sets. Free UK delivery on orders over £40.",
-    d4: "e.g. Join 20,000+ happy customers and find your new favourite scent today."
+  // Demo brand: shown as input hints, and used in previews for any empty group
+  const DEMO = {
+    biz: "Coastal Candle Co.",
+    url: "https://www.coastalcandle.co",
+    heads: ["Handmade Soy Candles", "Free Delivery Over $50", "Shop Our Bestsellers", "Rated 4.9 by 2,000+ Buyers", "New Autumn Collection"],
+    long: "Hand-Poured Soy Candles, Made in Small Batches and Delivered Free",
+    descs: [
+      "Hand-poured soy candles with natural scents. Order today for free gift wrapping.",
+      "Natural scents, clean burn, made to last.",
+      "Bundle and save on gift sets. Free delivery on orders over $50.",
+      "Join 20,000+ happy customers and find your new favourite scent today."
+    ]
   };
-  Object.entries(placeholders).forEach(([id, ph]) => { const el = $("#" + id); if (el) el.placeholder = ph; });
+  DEMO.heads.forEach((v, i) => { const el = $("#h" + (i + 1)); if (el) el.placeholder = "e.g. " + v; });
+  DEMO.descs.forEach((v, i) => { const el = $("#d" + (i + 1)); if (el) el.placeholder = "e.g. " + v; });
+  $("#lh1").placeholder = "e.g. " + DEMO.long;
+  $("#bizName").placeholder = "e.g. " + DEMO.biz;
+  $("#finalUrl").placeholder = "e.g. " + DEMO.url;
 
   // ---------- Counters and copy checks ----------
   function updateCount(input) {
@@ -56,7 +66,9 @@
     const n = len(input.value);
     counter.textContent = `${n}/${max}`;
     counter.classList.toggle("near", n >= max - 5 && n < max);
-    counter.classList.toggle("full", n >= max);
+    counter.classList.toggle("full", n === max);
+    counter.classList.toggle("over", n > max);
+    input.classList.toggle("over", n > max);
   }
 
   function checkCopy() {
@@ -66,6 +78,7 @@
       const v = input.value.trim();
       const warn = $(`[data-warn="${input.id}"]`);
       const notes = [];
+      if (len(v) > LIMITS.headline) notes.push(`${len(v) - LIMITS.headline} characters over the 30 limit. Google won't accept it as is.`);
       if (v.includes("!")) notes.push("Google doesn't allow exclamation marks in headlines.");
       if (/\b[A-Z]{4,}\b/.test(v)) notes.push("Avoid words in ALL CAPS; Google may disapprove them.");
       const key = v.toLowerCase();
@@ -74,11 +87,18 @@
       warn.textContent = notes.join(" ");
     });
     const lh = $("#lh1"), lhWarn = $('[data-warn="lh1"]');
-    if (lh && lhWarn) lhWarn.textContent = lh.value.includes("!") ? "Google doesn't allow exclamation marks in headlines." : "";
+    if (lh && lhWarn) {
+      const n = [];
+      if (len(lh.value.trim()) > 90) n.push(`${len(lh.value.trim()) - 90} characters over the 90 limit.`);
+      if (lh.value.includes("!")) n.push("Google doesn't allow exclamation marks in headlines.");
+      lhWarn.textContent = n.join(" ");
+    }
     $$('input[data-kind="d"]').forEach(input => {
       const warn = $(`[data-warn="${input.id}"]`);
-      const v = input.value;
-      warn.textContent = /!.*!/.test(v) ? "Use at most one exclamation mark in descriptions." : "";
+      const v = input.value.trim(), n = [];
+      if (len(v) > LIMITS.description) n.push(`${len(v) - LIMITS.description} characters over the 90 limit. Google won't accept it as is.`);
+      if (/!.*!/.test(v)) n.push("Use at most one exclamation mark in descriptions.");
+      warn.textContent = n.join(" ");
     });
   }
 
@@ -103,6 +123,7 @@
       input.classList.remove("invalid");
       checkCopy();
       save();
+      if (!preview.hidden) renderChecklist();
     });
   });
   restore();
@@ -127,6 +148,21 @@
     $(".remove", slotEl).hidden = true;
     $('input[type="file"]', slotEl).value = "";
     setMsg(slotEl, "");
+    if (!preview.hidden && !resetting) { render(); renderChecklist(); }
+  }
+
+  // Google's rules for each image slot; problems are reported, never blocking
+  function imageIssues(slotEl, w, h, size) {
+    const out = [];
+    const name = slotEl.querySelector(".up-title").textContent;
+    const minW = Number(slotEl.dataset.minW), minH = Number(slotEl.dataset.minH);
+    const ratio = Number(slotEl.dataset.ratio);
+    const rec = slotEl.dataset.rec.split(" x ").map(Number);
+    if (w < minW || h < minH) out.push({ level: "req", text: `${name}: ${w} x ${h} is below Google's minimum of ${minW} x ${minH}.` });
+    else if (w < rec[0]) out.push({ level: "rec", text: `${name}: ${w} x ${h} works, but ${slotEl.dataset.rec} is recommended for sharp results.` });
+    if (Math.abs(w / h - ratio) / ratio > 0.02) out.push({ level: "rec", text: `${name}: ${w} x ${h} isn't ${ratio === 1 ? "square (1:1)" : "1.91:1"}, so Google will crop it. Use ${slotEl.dataset.rec}.` });
+    if (size > MAX_FILE_BYTES) out.push({ level: "req", text: `${name}: file is over 5 MB, Google's limit. Compress it before uploading to Google Ads.` });
+    return out;
   }
 
   function handleFile(slotEl, file) {
@@ -134,37 +170,24 @@
     if (!/^image\/(png|jpeg|webp|gif)$/.test(file.type)) {
       setMsg(slotEl, "Please upload a PNG, JPG, WebP or GIF image.", "err"); return;
     }
-    if (file.size > MAX_FILE_BYTES) {
-      setMsg(slotEl, "This file is over 5 MB, Google's limit for image assets. Please compress it.", "err"); return;
-    }
     const url = URL.createObjectURL(file);
     const probe = new Image();
     probe.onload = () => {
       const w = probe.naturalWidth, h = probe.naturalHeight;
       const minW = Number(slotEl.dataset.minW), minH = Number(slotEl.dataset.minH);
       const ratio = Number(slotEl.dataset.ratio);
-      if (w < minW || h < minH) {
-        URL.revokeObjectURL(url);
-        setMsg(slotEl, `${w} x ${h} is too small. Minimum is ${minW} x ${minH}; ${slotEl.dataset.rec} recommended.`, "err");
-        return;
-      }
       if (images[slotEl.dataset.slot]) URL.revokeObjectURL(images[slotEl.dataset.slot].url);
-      images[slotEl.dataset.slot] = { url, w, h };
+      const issues = imageIssues(slotEl, w, h, file.size);
+      images[slotEl.dataset.slot] = { url, w, h, issues };
       const img = $(".drop img", slotEl);
       img.src = url; img.hidden = false;
       $(".drop-empty", slotEl).hidden = true;
       $(".drop", slotEl).classList.add("has-img");
       $(".remove", slotEl).hidden = false;
 
-      const off = Math.abs(w / h - ratio) / ratio;
-      const rec = slotEl.dataset.rec.split(" x ").map(Number);
-      if (off > 0.02) {
-        setMsg(slotEl, `${w} x ${h} isn't ${ratio === 1 ? "square (1:1)" : "1.91:1"}. Google will crop it; ${slotEl.dataset.rec} is ideal.`, "warn");
-      } else if (w < rec[0]) {
-        setMsg(slotEl, `${w} x ${h} works. ${slotEl.dataset.rec} is recommended for the sharpest results.`, "warn");
-      } else {
-        setMsg(slotEl, `${w} x ${h}: perfect size.`, "ok");
-      }
+      if (!preview.hidden) { render(); renderChecklist(); }
+      if (!issues.length) setMsg(slotEl, `${w} x ${h}: perfect size.`, "ok");
+      else setMsg(slotEl, issues.map(i => i.text).join(" "), issues.some(i => i.level === "req") ? "err" : "warn");
     };
     probe.onerror = () => { URL.revokeObjectURL(url); setMsg(slotEl, "This image couldn't be read. Try another file.", "err"); };
     probe.src = url;
@@ -181,20 +204,81 @@
   });
 
   // ---------- Collect inputs (anything can be missing) ----------
-  const FALLBACK = {
-    heads: ["Your Headline Here", "Your Second Headline", "Your Third Headline"],
-    descs: ["Your description appears here. Add one to see how it reads."]
-  };
-  function collect() {
-    const heads = $$('input[data-kind="h"]').map(i => i.value.trim()).filter(Boolean);
-    const descs = $$('input[data-kind="d"]').map(i => i.value.trim()).filter(Boolean);
+  function raw() {
     return {
-      heads: heads.length ? heads : FALLBACK.heads,
-      descs: descs.length ? descs : FALLBACK.descs,
+      heads: $$('input[data-kind="h"]').map(i => i.value.trim()).filter(Boolean),
+      descs: $$('input[data-kind="d"]').map(i => i.value.trim()).filter(Boolean),
       long: $("#lh1").value.trim(),
       biz: $("#bizName").value.trim(),
       url: $("#finalUrl").value.trim()
     };
+  }
+  function collect() {
+    const r = raw();
+    return {
+      heads: r.heads.length ? r.heads : DEMO.heads,
+      descs: r.descs.length ? r.descs : DEMO.descs,
+      long: r.long || (r.heads.length ? "" : DEMO.long),
+      biz: r.biz || DEMO.biz,
+      url: r.url || DEMO.url
+    };
+  }
+
+  // ---------- Launch checklist shown above the previews ----------
+  function checklist() {
+    const r = raw(), items = [];
+    const add = (level, text) => items.push({ level, text });
+    if (!r.heads.length) add("demo", "No headlines yet, so demo headlines are shown.");
+    else if (r.heads.length < 3) add("req", `Add at least 3 headlines. Google requires 3 (you have ${r.heads.length}).`);
+    else if (r.heads.length < 5) add("rec", `Add ${5 - r.heads.length} more headline${r.heads.length === 4 ? "" : "s"}. More headlines give Google more combinations.`);
+    const longHeads = r.heads.filter(h => len(h) > LIMITS.headline).length;
+    if (longHeads) add("req", `${longHeads} headline${longHeads > 1 ? "s are" : " is"} over 30 characters.`);
+    if (new Set(r.heads.map(h => h.toLowerCase())).size !== r.heads.length) add("rec", "Some headlines are duplicates. Make each one unique.");
+    if (r.heads.some(h => h.includes("!")) || r.long.includes("!")) add("req", "Remove exclamation marks from headlines. Google disapproves them.");
+    if (r.heads.some(h => /\b[A-Z]{4,}\b/.test(h))) add("rec", "Avoid ALL CAPS words in headlines.");
+    if (!r.long) add(r.heads.length ? "req" : "demo", r.heads.length ? "Add a long headline. Performance Max requires at least one." : "No long headline yet, so a demo one is shown.");
+    else if (len(r.long) > 90) add("req", "Long headline is over 90 characters.");
+    if (!r.descs.length) add("demo", "No descriptions yet, so demo descriptions are shown.");
+    else {
+      if (r.descs.length < 2) add("req", "Add at least 2 descriptions. Google requires 2.");
+      if (!r.descs.some(d => len(d) <= LIMITS.shortDescription)) add("req", "Make at least one description 60 characters or fewer.");
+      const longD = r.descs.filter(d => len(d) > LIMITS.description).length;
+      if (longD) add("req", `${longD} description${longD > 1 ? "s are" : " is"} over 90 characters.`);
+    }
+    if (!r.biz) add("demo", "No business name yet, so a demo name is shown.");
+    else if (len(r.biz) > LIMITS.bizName) add("req", "Business name is over 25 characters.");
+    if (!r.url) add("demo", "No Final URL yet, so a demo website is shown.");
+    else if (domainOf(r.url) === "yourwebsite.com") add("req", "The Final URL doesn't look valid.");
+    [["logo", "Upload a business logo. Performance Max requires one."], ["square", "Upload a square image (1200 x 1200). Performance Max requires one."], ["landscape", "Upload a landscape image (1200 x 628). Performance Max requires one."]]
+      .forEach(([slot, msg]) => { if (!images[slot]) add("req", msg); else images[slot].issues.forEach(i => add(i.level, i.text)); });
+    return items;
+  }
+
+  function renderChecklist() {
+    const box = $("#checklist");
+    const items = checklist();
+    const order = { req: 0, rec: 1, demo: 2 };
+    items.sort((a, b) => order[a.level] - order[b.level]);
+    const fixes = items.filter(i => i.level !== "demo").length;
+    box.innerHTML = "";
+    box.className = "checklist " + (items.some(i => i.level === "req") ? "has-req" : fixes ? "has-rec" : items.length ? "has-demo" : "ok");
+    const head = document.createElement("div");
+    head.className = "cl-head";
+    head.textContent = !items.length ? "Ready to launch: every asset meets Google's requirements."
+      : fixes ? `${fixes} thing${fixes > 1 ? "s" : ""} to fix before launch` : "Preview uses demo content";
+    box.appendChild(head);
+    if (!items.length) return;
+    const ul = document.createElement("ul");
+    items.forEach(i => {
+      const li = document.createElement("li");
+      li.className = "cl-" + i.level;
+      const tag = document.createElement("span");
+      tag.className = "cl-tag";
+      tag.textContent = i.level === "req" ? "Required" : i.level === "rec" ? "Recommended" : "Demo";
+      li.append(tag, document.createTextNode(i.text));
+      ul.appendChild(li);
+    });
+    box.appendChild(ul);
   }
 
   // ---------- Small DOM helper (text is always set safely) ----------
@@ -361,6 +445,7 @@
   form.addEventListener("submit", e => {
     e.preventDefault();
     render();
+    renderChecklist();
     preview.hidden = false;
     preview.scrollIntoView({ behavior: "smooth", block: "start" });
   });
@@ -375,7 +460,9 @@
 
   $("#resetBtn").addEventListener("click", () => {
     textInputs.forEach(i => { i.value = ""; i.classList.remove("invalid"); updateCount(i); });
+    resetting = true;
     $$(".upload").forEach(clearSlot);
+    resetting = false;
     checkCopy();
     try { localStorage.removeItem(STORE_KEY); } catch (e) { /* ignore */ }
     preview.hidden = true;
