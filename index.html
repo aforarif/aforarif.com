@@ -195,7 +195,7 @@
             <p class="about-proof">The results speak for themselves: <span class="hl">up to 13x ROAS</span>, <span class="hl">$60K+ in monthly revenue</span> for one brand and <span class="hl">61% sales growth</span> for another.</p>
             <div class="about-cta">
               <a href="#contact" class="btn">Start a project</a>
-              <a href="https://www.linkedin.com/in/aisforarif" target="_blank" rel="noopener" class="link-arrow">View LinkedIn profile <svg><use href="#u-arrow"/></svg></a>
+              <a href="https://www.linkedin.com/in/aisforarif" target="_blank" rel="noopener" class="btn btn-li"><svg aria-hidden="true"><use href="#i-linkedin"/></svg>View LinkedIn profile</a>
             </div>
           </div>
 
@@ -777,6 +777,34 @@
       </div>
     </div>
   </footer>
+
+  <!-- Free audit pop-up -->
+  <aside class="audit" id="audit" aria-labelledby="auditTitle" hidden>
+    <button type="button" class="audit-x" id="auditClose" aria-label="Minimise"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    <div class="audit-body" id="auditBody">
+      <span class="audit-badge">Free</span>
+      <h2 id="auditTitle">Get a free ads audit</h2>
+      <p class="audit-sub">Share your website and I'll review your ads and tracking, then send you practical quick wins.</p>
+      <form id="auditForm" novalidate>
+        <label>Name<input type="text" name="name" autocomplete="name" required></label>
+        <label>Email<input type="email" name="email" autocomplete="email" required></label>
+        <label>Website<input type="text" name="website" inputmode="url" autocomplete="url" placeholder="yourstore.com" required></label>
+        <input type="text" name="company" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <p class="audit-msg" id="auditMsg" role="status"></p>
+        <div class="audit-actions">
+          <button type="submit" class="btn" id="auditSubmit">Free Audit</button>
+          <button type="reset" class="btn btn-ghost">Reset</button>
+        </div>
+        <p class="audit-note">No spam. Your details are only used for your audit. <a href="privacy-policy.html">Privacy Policy</a></p>
+      </form>
+    </div>
+    <div class="audit-done" id="auditDone" hidden>
+      <div class="audit-check"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></div>
+      <h2>Thanks! Request received.</h2>
+      <p>I'll review your website and get back to you by email soon.</p>
+    </div>
+  </aside>
+  <button type="button" class="audit-tab" id="auditTab" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18M7 15l4-4 3 3 5-6"/></svg>Free audit</button>
 
   <a href="#home" class="to-top" id="toTop" aria-label="Back to top">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
