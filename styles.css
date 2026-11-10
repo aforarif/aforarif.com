@@ -88,7 +88,8 @@ p + p { margin-top: 1rem; }
 .nav-links a:not(.btn) { color: var(--ink); font-weight: 500; font-size: .92rem; position: relative; }
 .nav-links a:not(.btn)::after { content: ""; position: absolute; left: 0; bottom: -4px; width: 0; height: 2px; background: var(--brand); transition: width .2s; }
 .nav-links a:not(.btn):hover::after, .nav-links a.active::after { width: 100%; }
-.nav-links a.active { color: var(--brand); }
+.nav-links a.active:not(.btn) { color: var(--brand); }
+.nav-links a.btn, .nav-links a.btn.active { color: var(--white); }
 .nav-toggle { display: none; background: none; border: 0; cursor: pointer; width: 40px; height: 40px; }
 .nav-toggle span { display: block; width: 24px; height: 2px; background: var(--ink); margin: 5px auto; transition: transform .25s, opacity .25s; }
 .nav-toggle.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
