@@ -488,8 +488,5 @@ p + p { margin-top: 1rem; }
 
 /* ===== Text highlights ===== */
 .hl { color: var(--brand); font-weight: 600; background: linear-gradient(transparent 64%, rgba(111,45,189,.13) 0); padding: 0 1px; border-radius: 2px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
-.lead strong { color: var(--ink); font-weight: 600; }
 .about-proof { color: var(--ink); font-weight: 500; padding-left: 16px; border-left: 3px solid var(--brand); }
 
-/* Hero intro: yellow highlighter on key values */
-.lead .hl { color: var(--ink); font-weight: 600; background: linear-gradient(104deg, rgba(255,214,10,0) 0.5%, #FFE16A 2.5%, #FFE16A 97%, rgba(255,214,10,0) 99.5%); padding: 1px 5px; margin: 0 -1px; border-radius: 6px 4px 7px 3px; }
