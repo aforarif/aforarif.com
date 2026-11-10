@@ -39,18 +39,25 @@
   const textInputs = $$('input[type="text"], input[type="url"]', form);
 
   // ---------- Placeholders that show good practice ----------
-  // Demo brand: shown as input hints, and used in previews for any empty group
+  // Agency demo (aforarif.com): used as input hints, and for the whole preview when the form is empty
   const DEMO = {
-    biz: "Coastal Candle Co.",
-    url: "https://www.coastalcandle.co",
-    heads: ["Handmade Soy Candles", "Free Delivery Over $50", "Shop Our Bestsellers", "Rated 4.9 by 2,000+ Buyers", "New Autumn Collection"],
-    long: "Hand-Poured Soy Candles, Made in Small Batches and Delivered Free",
+    biz: "aforarif.com",
+    url: "https://aforarif.com",
+    heads: ["Google & Meta Ads Specialist", "Up to 13x ROAS for Clients", "$200K+ Ad Spend Managed", "Book a Free Consultation", "Scale Your Store Profitably"],
+    long: "Profitable Google Ads, Meta Ads and Email Marketing for E-commerce and Service Brands",
     descs: [
-      "Hand-poured soy candles with natural scents. Order today for free gift wrapping.",
-      "Natural scents, clean burn, made to last.",
-      "Bundle and save on gift sets. Free delivery on orders over $50.",
-      "Join 20,000+ happy customers and find your new favourite scent today."
-    ]
+      "Lead media buyer with 7+ years in paid media. Book a free consultation and audit today.",
+      "Lower your CPA and scale ROAS with data-driven ads.",
+      "Google Ads, Meta Ads, Klaviyo email and B2B outreach, managed by a proven specialist.",
+      "Trusted by brands in the US, UK and Europe, with clear monthly reporting."
+    ],
+    images: { logo: "demo/logo.png", square: "demo/square.jpg", landscape: "demo/landscape.jpg" }
+  };
+  // Neutral placeholders for gaps once a client has started entering their own assets
+  const BLANK = {
+    biz: "Your Business",
+    heads: ["Your Headline Here", "Your Second Headline", "Your Third Headline"],
+    descs: ["Your description appears here."]
   };
   DEMO.heads.forEach((v, i) => { const el = $("#h" + (i + 1)); if (el) el.placeholder = "e.g. " + v; });
   DEMO.descs.forEach((v, i) => { const el = $("#d" + (i + 1)); if (el) el.placeholder = "e.g. " + v; });
@@ -59,6 +66,8 @@
   $("#finalUrl").placeholder = "e.g. " + DEMO.url;
 
   // ---------- Counters and copy checks ----------
+  const ACRONYMS = new Set(["ROAS", "PPC", "SEO", "SEM", "CPA", "CPC", "CPM", "CTR", "GA4", "USA", "B2B", "B2C", "SAAS", "HVAC", "FAQS", "NASA", "UEFA"]);
+  const capsWords = v => (v.match(/\b[A-Z0-9]{4,}\b/g) || []).filter(w => /[A-Z]{2}/.test(w) && !ACRONYMS.has(w));
   function updateCount(input) {
     const max = Number(input.dataset.max);
     const counter = $(`.count[data-for="${input.id}"]`);
@@ -80,7 +89,7 @@
       const notes = [];
       if (len(v) > LIMITS.headline) notes.push(`${len(v) - LIMITS.headline} characters over the 30 limit. Google won't accept it as is.`);
       if (v.includes("!")) notes.push("Google doesn't allow exclamation marks in headlines.");
-      if (/\b[A-Z]{4,}\b/.test(v)) notes.push("Avoid words in ALL CAPS; Google may disapprove them.");
+      if (capsWords(v).length) notes.push("Avoid words in ALL CAPS; Google may disapprove them.");
       const key = v.toLowerCase();
       if (v && seen.has(key)) notes.push(`Same as headline ${seen.get(key)}. Use unique headlines.`);
       if (v && !seen.has(key)) seen.set(key, i + 1);
@@ -213,14 +222,20 @@
       url: $("#finalUrl").value.trim()
     };
   }
+  function isDemo() {
+    const r = raw();
+    return !r.heads.length && !r.descs.length && !r.long && !r.biz && !r.url && !images.logo && !images.square && !images.landscape;
+  }
+  let demoMode = false;
   function collect() {
     const r = raw();
+    if (demoMode) return { heads: DEMO.heads, descs: DEMO.descs, long: DEMO.long, biz: DEMO.biz, url: DEMO.url };
     return {
-      heads: r.heads.length ? r.heads : DEMO.heads,
-      descs: r.descs.length ? r.descs : DEMO.descs,
-      long: r.long || (r.heads.length ? "" : DEMO.long),
-      biz: r.biz || DEMO.biz,
-      url: r.url || DEMO.url
+      heads: r.heads.length ? r.heads : BLANK.heads,
+      descs: r.descs.length ? r.descs : BLANK.descs,
+      long: r.long,
+      biz: r.biz || BLANK.biz,
+      url: r.url
     };
   }
 
@@ -228,26 +243,30 @@
   function checklist() {
     const r = raw(), items = [];
     const add = (level, text) => items.push({ level, text });
-    if (!r.heads.length) add("demo", "No headlines yet, so demo headlines are shown.");
+    if (demoMode) {
+      add("demo", "This is a demo ad for aforarif.com. Fill in the fields above to preview your own ads.");
+      return items;
+    }
+    if (!r.heads.length) add("req", "Add at least 3 headlines. Placeholder headlines are shown for now.");
     else if (r.heads.length < 3) add("req", `Add at least 3 headlines. Google requires 3 (you have ${r.heads.length}).`);
     else if (r.heads.length < 5) add("rec", `Add ${5 - r.heads.length} more headline${r.heads.length === 4 ? "" : "s"}. More headlines give Google more combinations.`);
     const longHeads = r.heads.filter(h => len(h) > LIMITS.headline).length;
     if (longHeads) add("req", `${longHeads} headline${longHeads > 1 ? "s are" : " is"} over 30 characters.`);
     if (new Set(r.heads.map(h => h.toLowerCase())).size !== r.heads.length) add("rec", "Some headlines are duplicates. Make each one unique.");
     if (r.heads.some(h => h.includes("!")) || r.long.includes("!")) add("req", "Remove exclamation marks from headlines. Google disapproves them.");
-    if (r.heads.some(h => /\b[A-Z]{4,}\b/.test(h))) add("rec", "Avoid ALL CAPS words in headlines.");
-    if (!r.long) add(r.heads.length ? "req" : "demo", r.heads.length ? "Add a long headline. Performance Max requires at least one." : "No long headline yet, so a demo one is shown.");
+    if (r.heads.some(h => capsWords(h).length)) add("rec", "Avoid ALL CAPS words in headlines.");
+    if (!r.long) add("req", "Add a long headline. Performance Max requires at least one.");
     else if (len(r.long) > 90) add("req", "Long headline is over 90 characters.");
-    if (!r.descs.length) add("demo", "No descriptions yet, so demo descriptions are shown.");
+    if (!r.descs.length) add("req", "Add at least 2 descriptions. A placeholder is shown for now.");
     else {
       if (r.descs.length < 2) add("req", "Add at least 2 descriptions. Google requires 2.");
       if (!r.descs.some(d => len(d) <= LIMITS.shortDescription)) add("req", "Make at least one description 60 characters or fewer.");
       const longD = r.descs.filter(d => len(d) > LIMITS.description).length;
       if (longD) add("req", `${longD} description${longD > 1 ? "s are" : " is"} over 90 characters.`);
     }
-    if (!r.biz) add("demo", "No business name yet, so a demo name is shown.");
+    if (!r.biz) add("req", "Add your business name. Google shows it in every ad.");
     else if (len(r.biz) > LIMITS.bizName) add("req", "Business name is over 25 characters.");
-    if (!r.url) add("demo", "No Final URL yet, so a demo website is shown.");
+    if (!r.url) add("rec", "Add your Final URL to show your website address in Search ads.");
     else if (domainOf(r.url) === "yourwebsite.com") add("req", "The Final URL doesn't look valid.");
     [["logo", "Upload a business logo. Performance Max requires one."], ["square", "Upload a square image (1200 x 1200). Performance Max requires one."], ["landscape", "Upload a landscape image (1200 x 628). Performance Max requires one."]]
       .forEach(([slot, msg]) => { if (!images[slot]) add("req", msg); else images[slot].issues.forEach(i => add(i.level, i.text)); });
@@ -265,7 +284,7 @@
     const head = document.createElement("div");
     head.className = "cl-head";
     head.textContent = !items.length ? "Ready to launch: every asset meets Google's requirements."
-      : fixes ? `${fixes} thing${fixes > 1 ? "s" : ""} to fix before launch` : "Preview uses demo content";
+      : fixes ? `${fixes} thing${fixes > 1 ? "s" : ""} to fix before launch` : "Demo preview";
     box.appendChild(head);
     if (!items.length) return;
     const ul = document.createElement("ul");
@@ -289,12 +308,14 @@
     return node;
   }
   function media(slot, cls, label) {
-    if (images[slot]) { const img = el("img", cls); img.src = images[slot].url; img.alt = ""; return img; }
+    const src = images[slot] ? images[slot].url : demoMode ? DEMO.images[slot] : null;
+    if (src) { const img = el("img", cls); img.src = src; img.alt = ""; return img; }
     const ph = el("div", cls + " ph", label || (slot === "square" ? "Square image" : "Landscape image"));
     return ph;
   }
   function logo(cls, biz) {
-    if (images.logo) { const img = el("img", "ad-logo " + (cls || "")); img.src = images.logo.url; img.alt = ""; return img; }
+    const src = images.logo ? images.logo.url : demoMode ? DEMO.images.logo : null;
+    if (src) { const img = el("img", "ad-logo " + (cls || "")); img.src = src; img.alt = ""; return img; }
     return el("div", "ad-logo ph " + (cls || ""), (biz || "A").trim().charAt(0).toUpperCase());
   }
 
@@ -413,6 +434,7 @@
   }
 
   function render() {
+    demoMode = isDemo();
     const d = collect();
     const cards = [
       ["search", "Google Search", searchAd(d)],
