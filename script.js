@@ -254,23 +254,27 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     let valid = true;
     form.querySelectorAll("[required]").forEach(field => {
-      const ok = field.value.trim() !== "" && field.checkValidity();
+      let ok = field.value.trim() !== "" && field.checkValidity();
+      if (ok && field.dataset.kind === "website") ok = /^(https?:\/\/)?[^\s.]+\.[^\s]{2,}$/i.test(field.value.trim());
       field.classList.toggle("invalid", !ok);
       if (!ok) valid = false;
     });
     if (!valid) {
-      note.textContent = "Please fill in your name, a valid email and your message.";
+      note.textContent = "Please fill in your full name, a valid email and your website.";
       note.classList.add("error");
       return;
     }
     const data = new FormData(form);
+    let site = data.get("website").trim();
+    if (!/^https?:\/\//i.test(site)) site = "https://" + site;
     const subject = `New enquiry from ${data.get("name")}`;
     const body =
-      `Name: ${data.get("name")}\n` +
+      `Full name: ${data.get("name")}\n` +
+      `Phone: ${data.get("phone").trim() || "Not provided"}\n` +
       `Email: ${data.get("email")}\n` +
-      `Service: ${data.get("service")}\n` +
-      `Website: ${data.get("website") || "Not provided"}\n\n` +
-      `${data.get("message")}`;
+      `Website: ${site}\n` +
+      `Service: ${data.get("service")}\n\n` +
+      `${data.get("message").trim() || "No message added."}`;
     window.location.href =
       `mailto:contact@aforarif.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     note.textContent = "Your email app should open now. Thanks for reaching out!";
