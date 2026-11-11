@@ -25,7 +25,7 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; scroll-padding-top: 118px; -webkit-text-size-adjust: 100%; }
+html { scroll-behavior: smooth; scroll-padding-top: 128px; -webkit-text-size-adjust: 100%; }
 body {
   font-family: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
   color: var(--text); background: var(--white); line-height: 1.7; font-size: 16px;
@@ -81,7 +81,7 @@ p + p { margin-top: 1rem; }
 .logo-light .logo-word span { color: var(--brand-light); }
 
 /* ===== Header ===== */
-.header { position: fixed; inset: 38px 0 auto; z-index: 50; background: rgba(255,255,255,.88); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid transparent; transition: border-color .2s, box-shadow .2s; }
+.header { position: fixed; inset: 48px 0 auto; z-index: 50; background: rgba(255,255,255,.88); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid transparent; transition: border-color .2s, box-shadow .2s; }
 .header.scrolled { border-color: var(--line); box-shadow: 0 4px 20px rgba(0,0,0,.04); }
 .nav { display: flex; align-items: center; justify-content: space-between; height: 72px; }
 .nav-links { display: flex; align-items: center; gap: 26px; }
@@ -98,7 +98,7 @@ p + p { margin-top: 1rem; }
 
 /* ===== Hero ===== */
 .hero {
-  padding: 178px 0 90px; overflow: hidden;
+  padding: 188px 0 90px; overflow: hidden;
   background: radial-gradient(circle at 85% 20%, rgba(111,45,189,.14), transparent 45%), radial-gradient(circle at 5% 95%, rgba(111,45,189,.08), transparent 40%), var(--white);
 }
 .hero-grid { display: grid; grid-template-columns: 1.25fr 1fr; gap: 56px; align-items: center; }
@@ -327,7 +327,7 @@ p + p { margin-top: 1rem; }
   .nav-links a:not(.btn) { padding: 14px 0; border-bottom: 1px solid var(--line); }
   .nav-links a:not(.btn)::after { display: none; }
   .nav-links .btn { margin-top: 16px; }
-  .hero { padding: 152px 0 70px; }
+  .hero { padding: 160px 0 70px; }
   .hero-grid, .about-grid, .contact-grid, .exp-grid { grid-template-columns: 1fr; gap: 44px; }
   .exp-intro { position: static; }
   .results-grid { grid-template-columns: repeat(2, 1fr); gap: 28px 20px; }
@@ -557,12 +557,12 @@ p + p { margin-top: 1rem; }
 .avatar-photo img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 
 /* ===== Announcement bar ===== */
-.topbar { position: fixed; top: 0; left: 0; right: 0; height: 38px; z-index: 52; color: #fff; font-size: .84rem; background: linear-gradient(90deg, var(--brand-deep), var(--brand) 55%, var(--brand-deep)); }
+.topbar { position: fixed; top: 0; left: 0; right: 0; height: 48px; z-index: 52; color: #fff; font-size: .95rem; letter-spacing: .01em; background: linear-gradient(90deg, var(--brand-deep), var(--brand) 55%, var(--brand-deep)); }
 .topbar-inner { height: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .topbar a { color: #fff; display: inline-flex; align-items: center; gap: 8px; font-weight: 500; white-space: nowrap; }
-.topbar svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.topbar svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .tb-phone:hover span { text-decoration: underline; text-underline-offset: 3px; }
-.tb-cta { background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.28); padding: 4px 12px; border-radius: 999px; font-weight: 600 !important; transition: background .2s, color .2s; }
+.tb-cta { background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.28); padding: 6px 16px; border-radius: 999px; font-weight: 600 !important; transition: background .2s, color .2s; }
 .tb-cta:hover { background: #fff; color: var(--brand) !important; }
 .tb-cta svg { transition: transform .2s; }
 .tb-cta:hover svg { transform: translateX(3px); }
@@ -574,7 +574,8 @@ p + p { margin-top: 1rem; }
 .contact-form .req { color: #DC2626; }
 .contact-form .opt { color: var(--muted); font-weight: 400; }
 @media (max-width: 600px) {
-  .topbar { font-size: .78rem; }
-  .tb-cta { padding: 3px 10px; }
+  .topbar { font-size: .88rem; }
+  .topbar svg { width: 16px; height: 16px; }
+  .tb-cta { padding: 5px 12px; }
   .form-row { grid-template-columns: 1fr; }
 }
