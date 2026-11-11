@@ -551,3 +551,7 @@ p + p { margin-top: 1rem; }
   .audit-tab { padding: 11px 16px; font-size: .86rem; }
 }
 @media (prefers-reduced-motion: reduce) { .audit { transition: none; } }
+
+/* Client photos in testimonials */
+.avatar-photo { padding: 0; overflow: hidden; background: var(--brand-soft); box-shadow: 0 0 0 3px #fff, 0 0 0 5px var(--brand-soft); }
+.avatar-photo img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
