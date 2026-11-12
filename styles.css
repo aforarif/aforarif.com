@@ -579,3 +579,9 @@ p + p { margin-top: 1rem; }
   .tb-cta { padding: 5px 12px; }
   .form-row { grid-template-columns: 1fr; }
 }
+
+/* About: single centred column */
+.about-solo { grid-template-columns: 1fr; max-width: 820px; margin: 0 auto; text-align: center; }
+.about-solo .about-cta { justify-content: center; }
+.about-solo .about-proof { display: inline-block; text-align: left; }
+#education .edu { margin-top: 56px; }
